@@ -1,6 +1,6 @@
 {
   "name": "ourchainjs-lib",
-  "version": "0.0.1",
+  "version": "0.0.5",
   "description": "Client-side OurChain JavaScript library",
   "main": "./src/index.js",
   "types": "./src/index.d.ts",
@@ -39,7 +39,8 @@
     "prettier": "prettier \"ts_src/**/*.ts\" \"test/**/*.ts\" --ignore-path ./.prettierignore",
     "prettierjs": "prettier \"src/**/*.js\" --ignore-path ./.prettierignore",
     "test": "npm run build && npm run format:ci && npm run lint && npm run nobuild:coverage",
-    "unit": "npm run build && npm run nobuild:unit"
+    "unit": "npm run build && npm run nobuild:unit",
+    "test:file": "npm run build && npm run mocha:ts -- 'test/transaction.spec.ts'"
   },
   "repository": {
     "type": "git",

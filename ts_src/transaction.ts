@@ -60,6 +60,13 @@ export interface Input {
   witness: Buffer[];
 }
 
+export interface Contract {
+  action: number;
+  code: Buffer;
+  address: Buffer;
+  args: string[];
+}
+
 export class Transaction {
   static readonly DEFAULT_SEQUENCE = 0xffffffff;
   static readonly SIGHASH_DEFAULT = 0x00;
@@ -141,6 +148,12 @@ export class Transaction {
     return true;
   }
 
+  contract: Contract = {
+    action: 0,
+    code: EMPTY_BUFFER,
+    address: Buffer.alloc(32, 0),
+    args: [''],
+  };
   version: number = 1;
   locktime: number = 0;
   ins: Input[] = [];
@@ -237,6 +250,12 @@ export class Transaction {
     const newTx = new Transaction();
     newTx.version = this.version;
     newTx.locktime = this.locktime;
+    newTx.contract = {
+      action: this.contract.action,
+      code: this.contract.code,
+      address: this.contract.address,
+      args: this.contract.args.map(arg => arg),
+    };
 
     newTx.ins = this.ins.map(txIn => {
       return {
@@ -630,6 +649,16 @@ export class Transaction {
     const bufferWriter = new BufferWriter(buffer, initialOffset || 0);
 
     bufferWriter.writeInt32(this.version);
+
+    // write contract buffer
+    // bufferWriter.writeUInt8(this.contract.action);
+    // bufferWriter.writeSlice(this.contract.code);
+    // bufferWriter.writeSlice(this.contract.address);
+    bufferWriter.writeVarInt(this.contract.args.length);
+    this.contract.args.forEach(arg => {
+      bufferWriter.writeVarSlice(Buffer.from(arg, 'utf8'));
+    });
+    // end write contract buffer
 
     const hasWitnesses = _ALLOW_WITNESS && this.hasWitnesses();
 

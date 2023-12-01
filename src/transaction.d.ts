@@ -10,6 +10,12 @@ export interface Input {
     sequence: number;
     witness: Buffer[];
 }
+export interface Contract {
+    action: number;
+    code: Buffer;
+    address: Buffer;
+    args: string[];
+}
 export declare class Transaction {
     static readonly DEFAULT_SEQUENCE = 4294967295;
     static readonly SIGHASH_DEFAULT = 0;
@@ -24,6 +30,7 @@ export declare class Transaction {
     static fromBuffer(buffer: Buffer, _NO_STRICT?: boolean): Transaction;
     static fromHex(hex: string): Transaction;
     static isCoinbaseHash(buffer: Buffer): boolean;
+    contract: Contract;
     version: number;
     locktime: number;
     ins: Input[];

@@ -40,6 +40,12 @@ function isOutput(out) {
 }
 class Transaction {
   constructor() {
+    this.contract = {
+      action: 0,
+      code: EMPTY_BUFFER,
+      address: Buffer.alloc(32, 0),
+      args: [''],
+    };
     this.version = 1;
     this.locktime = 0;
     this.ins = [];
@@ -176,6 +182,12 @@ class Transaction {
     const newTx = new Transaction();
     newTx.version = this.version;
     newTx.locktime = this.locktime;
+    newTx.contract = {
+      action: this.contract.action,
+      code: this.contract.code,
+      address: this.contract.address,
+      args: this.contract.args.map(arg => arg),
+    };
     newTx.ins = this.ins.map(txIn => {
       return {
         hash: txIn.hash,
@@ -496,6 +508,15 @@ class Transaction {
       initialOffset || 0,
     );
     bufferWriter.writeInt32(this.version);
+    // write contract buffer
+    // bufferWriter.writeUInt8(this.contract.action);
+    // bufferWriter.writeSlice(this.contract.code);
+    // bufferWriter.writeSlice(this.contract.address);
+    bufferWriter.writeVarInt(this.contract.args.length);
+    this.contract.args.forEach(arg => {
+      bufferWriter.writeVarSlice(Buffer.from(arg, 'utf8'));
+    });
+    // end write contract buffer
     const hasWitnesses = _ALLOW_WITNESS && this.hasWitnesses();
     if (hasWitnesses) {
       bufferWriter.writeUInt8(Transaction.ADVANCED_TRANSACTION_MARKER);
